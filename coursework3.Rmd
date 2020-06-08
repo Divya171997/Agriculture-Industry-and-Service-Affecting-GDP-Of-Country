@@ -1,0 +1,209 @@
+---
+title: "Course_Work3"
+author: "Divya Arora"
+date: "11/12/2019"
+output:
+  html_document:
+    df_print: paged
+---
+
+```{r setup, include=FALSE}
+library(tidyverse)
+library(dplyr)
+library(plyr)
+library(highcharter)
+library(lattice)
+library(Hmisc)
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Introduction
+
+GDP is directly proportional to economy, more the gdp more will be the economy of the country.Sectors plays an important role in analysing the gdp of the country because they are the factors through which there is a flow of liquidity in the country which contributes a major role on the economic activities of the country.We have analysed from coursework 2 that sectors are the major factors affecting the GDP. With the help of principal component graph below by using orthogonal transformation, we can determine that what are the principal factors affecting the GDP per capita of the country.We can say that agriculture, Industry and Services are the principle components affecting the GDP per capita of the country.In this report, we will briefly descibe how sectors are effecting gdp of the country.
+
+```{r fig.height=2,echo=FALSE}
+data <- read.csv("C:/Users/HP/Desktop/Coursework 3/Coursework 3/CIA Factsheet 2013.csv",header=TRUE)
+data37=data
+data.df <- data37 %>%
+    select_if(is.numeric) %>%
+    cor(.)
+  hchart(princomp(data.df, cor = TRUE))
+  
+
+```
+
+## Data
+
+The dataset consists of twenty one factors out of which I have done the analysis on three important sectors-Agriculture, Industry and Service which plays a major role in determining the GDP of the country for the year 2016.The format of the dataset is in CSV and gives me information regarding the sectors:*Agriculture*:It includes farming, fishing, and forestry. 
+*Indsutry*:It includes mining, manufacturing, energy production, and construction.*Services*:It includes government activities, communications, transportation, finance, and all other private economic activities that do not produce material goods.
+
+Agriculture Description
+```{r,echo=FALSE}
+#describe data
+describe(data37$Agriculture)
+```
+
+Industry Description
+```{r,echo=FALSE}
+describe(data37$Industry)
+
+```
+
+Service Description
+```{r,echo=FALSE}
+describe(data37$Service)
+```
+
+## Methods
+
+We have used descriptive statistics to describe our data by using quartile, Range, Summary, Percentage, cross Tabulation .I have used two interactive Stacked bar chart for showing the contribution of agriculture, industry and Service effect on the GDP per capita of the country as well as on Continent to comprehend,interactive density plot to show the distribution and also principal component graph for showing the relationship of sectors with the GDP.
+
+```{r,echo=FALSE,include=FALSE}
+################Descriptive Stastics#################
+data <- read.csv("C:/Users/HP/Desktop/Coursework 3/Coursework 3/CIA Factsheet 2013.csv",header=TRUE)
+data37=data
+
+#describe data
+describe(data37$Agriculture)
+describe(data37$Industry)
+describe(data37$Service)
+describe(data37$GDP.PPP.Per.Capita....)
+
+#Quartile
+quantile(data37$Agriculture, probs = c(0.05, 0.1, 0.5, 0.9, 0.95))
+quantile(data37$Industry, probs = c(0.05, 0.1, 0.5, 0.9, 0.95))
+quantile(data37$Service, probs = c(0.05, 0.1, 0.5, 0.9, 0.95))
+quantile(data37$GDP.PPP.Per.Capita...., probs = c(0.05, 0.1, 0.5, 0.9, 0.95))
+
+#range
+range(data37$Agriculture)
+range(data37$Industry)
+range(data37$Service)
+range(data37$GDP.PPP.Per.Capita....)
+
+# Summary to see average
+#Descriptibve Stastics of chosen variables
+#a.tabulation of the variables
+table(data37$Agriculture)
+table(data37$Industry)
+table(data37$Service)
+
+
+#b. Percentage of each sector
+a<-round(100*prop.table(table(data37$GDP.PPP.Per.Capita....)),2)
+b<-round(100*prop.table(table(data37$Agriculture)),2)
+c<-round(100*prop.table(table(data37$Industry)),2)
+d<-round(100*prop.table(table(data37$Service)),2)
+
+#Cross Tabulations
+ab<-table(data37$GDP.PPP.Per.Capita....,data37$Agriculture)
+bc<-table(data37$GDP.PPP.Per.Capita....,data37$Industry)
+cd<-table(data37$GDP.PPP.Per.Capita....,data37$Service)
+
+#proportion
+head(prop.table(ab))
+head(prop.table(bc))
+head(prop.table(cd))
+
+```
+
+## Results and Discussions
+
+I have worked on the sectors affecting gdp of country world wide for the year 2016 based on the CIA_dataset.On analysing the data of sectors it is analysed that sectors are affecting the gdp per capita of the countries significantly.Preliminary analysis was done using Principal Component graph which sheds light on interesting relationship between sectors and gdp followed by stacked bar chart of country and continent then lattice scatter plots for continents.Sector division based on gdp per capita in Countries.To make the visualization more precise and clear I have taken only first few countries otherwise it becomes very complex to draw insights from the graph which clearly shows that majority of the countries just like Afghanistan,Albania, Algeria,America Samoa,Andorra are dominated by services sector followed by industry then agriculture.While there are some exceptional countries just like Angola in which industry sector is dominating the gdp per capita of the country. 
+```{r fig.height=2, echo=FALSE }
+ #############stacked bar chart of countries###################
+  bs.table = data.frame(agriculture=head(data37$Agriculture),industry=head(data37$Industry),service=head(data37$Service),coun=head(data37$Countries),gdp=head(data37$GDP.PPP.Per.Capita....))
+  
+  highchart() %>% 
+    hc_chart(type = "column") %>%
+    hc_plotOptions(column = list(stacking = "normal")) %>%
+    hc_xAxis(categories = bs.table$coun) %>%
+    hc_add_series(name="Agriculture",
+                  data = bs.table$agriculture,
+                  stack = "gdp") %>%
+    hc_add_series(name="Industry",
+                  data = bs.table$industry,
+                  stack = "gdp") %>%
+    hc_add_series(name="Service",
+                  data = bs.table$service,
+                  stack = "gdp") %>%
+    hc_add_theme(hc_theme_ft())
+```
+Sector division based on gdp per capita in Continents shows that overall all in all continents gdp is dominated by services sector except Africa continent in which among 54 countries just like Algeria, Egypt, Libya, Morocco, Sudan and Tunisia ,majority of the countries gdp is dominated by industry sector rather then services. 
+```{r fig.height=5, echo=FALSE }
+ #############stacked bar chart of continents######################
+  bs1.table = data.frame(agriculture=head(data37$Agriculture),industry=head(data37$Industry),service=head(data37$Service),continent=head(data37$Continent),gdp=head(data37$GDP.PPP.Per.Capita....))
+  
+  highchart() %>% 
+    hc_chart(type = "column") %>%
+    hc_plotOptions(column = list(stacking = "normal")) %>%
+    hc_xAxis(categories = bs1.table$continent) %>%
+    hc_add_series(name="Agriculture",
+                  data = bs1.table$agriculture,
+                  stack = "gdp") %>%
+    hc_add_series(name="Industry",
+                  data = bs1.table$industry,
+                  stack = "gdp") %>%
+    hc_add_series(name="Service",
+                  data = bs1.table$service,
+                  stack = "gdp") %>%
+    hc_add_theme(hc_theme_ft())
+
+```
+Density plot clearly shows the distribution of sectors over different countries and summarizing that services are having the highest affect then industry followed by agriculture.
+```{r fig.height=2, echo=FALSE }
+#density plot
+  data <- read.csv("C:/Users/HP/Desktop/Coursework 3/Coursework 3/CIA Factsheet 2013.csv",header=TRUE)
+data37=data
+  hc1 <- highchart() %>%
+    hc_xAxis(categories = data37$Countries) %>%
+    hc_add_series(name = "Agriculture", data = data37$Agriculture) %>%
+    hc_add_series(name = "Industry", data = data37$Industry) %>%
+  hc_add_series(name = "Service", data = data37$Service)
+  hc1
+
+```
+
+## Interesting Questions
+
+* What is the most significant sector among agriculture,industry and services affecting the gdp per capita of the world ?
+* Which country gdp per capita is dominated by which sector among three?
+* Which sector is having the least effect on gdp per capita?
+* Which country and continent gdp are highly affected by the services sector?
+* Which sector is overall affecting the gdp per capita of the continent by considering all countries?
+* What are the countries affected by the agriculture sector?
+* What are the countries least affected by the agriculture sector?
+* Which sector having neither high nor low affect on the gdp of the countries?
+* Which continent stands odd against all by not having the services as the major contribution in gdp per capita?
+* What is the level of correlation of the gdp per capita of countries with different sectors?
+* What is the distribution of different sectors over countries?
+ 
+## Conclusions
+
+We can witness that majority of the countries GDP per capita is dominated by services sector followed by industry and agriculture having the least effect from the stacked bar chart we have used.It can be stated that all the continents are affected by services sector significantly except the continent Africa which is dominated by industry rather than services. To recapitulate, I have used lattice scatter plot to show services individual contribution on each continent consists of various countries.
+
+```{r fig.height=3, echo=FALSE}
+########################showing sectors affecting gdp based on the continent with the help of lattice plots
+  #xyplot(Agriculture~GDP.PPP.Per.Capita.... | data37$Continent,data37)
+  #xyplot(Industry~GDP.PPP.Per.Capita.... | data37$Continent,data37)
+  xyplot(Service~GDP.PPP.Per.Capita....| data37$Continent,data37) 
+
+```
+
+## References
+
+http://jkunst.com/highcharter/
+
+https://www.datanovia.com/en/lessons/heatmap-in-r-static-and-interactive-visualization/
+
+https://www.stat.ubc.ca/~jenny/STAT545A/block09_xyplotLattice.html
+
+https://www.linkedin.com/learning/r-interactive-visualizations-with-htmlwidgets/create-interactive-stacked-bar-charts?u=51088249
+https://davetang.org/muse/2018/05/15/making-a-heatmap-in-r-with-the-pheatmap-package/
+
+https://www.highcharts.com/blog/data-science/highcharts-for-r-users/
+
+
+
+
+
